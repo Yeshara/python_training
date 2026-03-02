@@ -10,7 +10,7 @@ print("\n=== SECTION 1: VARIABLES & MANAGING DATA ===")
 
 # 🟢 EASY:
 # Store your name and age and print them.
-my_name = "Sakaroa"
+my_name = "Sakaria"
 my_age = 23
 
 print(f'Name: {my_name}, Age: {my_age}')
