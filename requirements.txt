@@ -1,2 +1,2 @@
-pandas 
+pandas
 pydantic == 2.8.2
