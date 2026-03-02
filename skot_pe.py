@@ -10,10 +10,8 @@ print(f"Hello, my name is {name} and I am {age} years old.")
 price = 49.99
 quantity = 3
 
-# Calculate total
 total = price * quantity
 
-# Round to 2 decimal places and format as currency
 formatted_total = f"£{total:.2f}"
 
 print(f"The total price is {formatted_total}")
