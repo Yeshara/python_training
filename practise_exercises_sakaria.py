@@ -1,3 +1,5 @@
+# from math import 
+
 """
 PYTHON 
 Choose your level:
@@ -16,7 +18,10 @@ print("\n=== SECTION 1: VARIABLES & MANAGING DATA ===")
 # 🔴 HARD:
 # Ask the user for their name and age using input()
 # Print a formatted introduction.
+name = input('Please enter your full name: ')
+age = input('Please enter your age: ')
 
+print(f'My name is {name}, I am {age} years old.')
 
 
 print("\n=== SECTION 2: DATA TYPES & STRING MANIPULATION ===")
@@ -32,7 +37,7 @@ quantity = 3
 
 # 🔴 HARD:
 # Round to 2 decimal places and format as currency.
-
+print(f'Total: R')
 
 
 print("\n=== SECTION 3: CONTROL FLOW ===")
