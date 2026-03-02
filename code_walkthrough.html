@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Fundamentals — Live Demo Script</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&display=swap');
+
+:root {
+–bg:        #0a0e1a;
+–surface:   #111827;
+–surface2:  #1a2235;
+–border:    #1e2d45;
+–teal:      #0d9488;
+–teal-lt:   #14b8a6;
+–teal-glow: rgba(13,148,136,0.18);
+–yellow:    #fcd34d;
+–white:     #f0f4ff;
+–gray:      #6b7fa3;
+–gray-lt:   #94a3b8;
+–green:     #4ade80;
+–blue:      #60a5fa;
+–purple:    #c084fc;
+–pink:      #f472b6;
+–orange:    #fb923c;
+–red:       #f87171;
+–code-bg:   #0d1117;
+–font-mono: ‘JetBrains Mono’, monospace;
+–font-ui:   ‘Syne’, sans-serif;
+}
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+background: var(–bg);
+color: var(–white);
+font-family: var(–font-ui);
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+/* ── HEADER ─────────────────────────────────────────── */
+header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 18px 32px;
+border-bottom: 1px solid var(–border);
+background: rgba(10,14,26,0.95);
+position: sticky;
+top: 0;
+z-index: 100;
+backdrop-filter: blur(12px);
+}
+
+.logo {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.logo-icon {
+width: 36px; height: 36px;
+background: linear-gradient(135deg, var(–teal), #065f46);
+border-radius: 8px;
+display: flex; align-items: center; justify-content: center;
+font-size: 18px;
+}
+
+.logo-text { font-size: 17px; font-weight: 700; color: var(–white); }
+.logo-sub  { font-size: 11px; color: var(–teal-lt); letter-spacing: 2px; text-transform: uppercase; font-family: var(–font-mono); }
+
+.progress-wrap {
+display: flex; align-items: center; gap: 14px;
+font-family: var(–font-mono); font-size: 13px; color: var(–gray);
+}
+
+.progress-bar {
+width: 160px; height: 4px;
+background: var(–border);
+border-radius: 99px; overflow: hidden;
+}
+
+.progress-fill {
+height: 100%;
+background: linear-gradient(90deg, var(–teal), var(–teal-lt));
+border-radius: 99px;
+transition: width 0.4s ease;
+}
+
+#progress-label { color: var(–teal-lt); font-weight: 600; }
+
+/* ── LAYOUT ─────────────────────────────────────────── */
+.shell {
+display: grid;
+grid-template-columns: 260px 1fr;
+height: calc(100vh - 65px);
+}
+
+/* ── SIDEBAR ────────────────────────────────────────── */
+aside {
+border-right: 1px solid var(–border);
+overflow-y: auto;
+padding: 20px 0;
+scrollbar-width: thin;
+scrollbar-color: var(–border) transparent;
+}
+
+.sidebar-section { margin-bottom: 6px; }
+
+.sidebar-heading {
+font-size: 9px;
+letter-spacing: 2.5px;
+text-transform: uppercase;
+color: var(–gray);
+padding: 10px 20px 4px;
+font-family: var(–font-mono);
+}
+
+.nav-item {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 9px 20px;
+cursor: pointer;
+font-size: 13px;
+color: var(–gray-lt);
+border-left: 3px solid transparent;
+transition: all 0.15s;
+font-family: var(–font-mono);
+}
+
+.nav-item:hover {
+background: var(–teal-glow);
+color: var(–white);
+}
+
+.nav-item.active {
+border-left-color: var(–teal);
+background: var(–teal-glow);
+color: var(–teal-lt);
+font-weight: 600;
+}
+
+.nav-dot {
+width: 7px; height: 7px;
+border-radius: 50%;
+flex-shrink: 0;
+}
+
+.nav-num {
+font-size: 10px;
+color: var(–gray);
+margin-left: auto;
+}
+
+/* ── MAIN CONTENT ───────────────────────────────────── */
+main {
+display: flex;
+flex-direction: column;
+overflow: hidden;
+}
+
+.demo-area {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 0;
+flex: 1;
+overflow: hidden;
+}
+
+/* ── EDITOR PANE ────────────────────────────────────── */
+.editor-pane {
+display: flex;
+flex-direction: column;
+border-right: 1px solid var(–border);
+overflow: hidden;
+}
+
+.pane-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 10px 16px;
+background: var(–surface);
+border-bottom: 1px solid var(–border);
+flex-shrink: 0;
+}
+
+.pane-title {
+font-family: var(–font-mono);
+font-size: 12px;
+color: var(–gray);
+display: flex; align-items: center; gap: 8px;
+}
+
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot-red    { background: #ff5f57; }
+.dot-yellow { background: #febc2e; }
+.dot-green  { background: #28c840; }
+
+.filename {
+color: var(–gray-lt);
+font-size: 12px;
+font-family: var(–font-mono);
+}
+
+.editor-scroll {
+flex: 1;
+overflow-y: auto;
+background: var(–code-bg);
+scrollbar-width: thin;
+scrollbar-color: var(–border) transparent;
+}
+
+.editor-scroll textarea {
+width: 100%;
+height: 100%;
+min-height: 300px;
+background: transparent;
+border: none;
+outline: none;
+color: #e2e8f0;
+font-family: var(–font-mono);
+font-size: 14px;
+line-height: 1.7;
+padding: 20px;
+resize: none;
+caret-color: var(–teal-lt);
+}
+
+/* ── SYNTAX HIGHLIGHT OVERLAY ───────────────────────── */
+.code-display {
+position: relative;
+flex: 1;
+overflow: hidden;
+}
+
+.highlighted-code {
+width: 100%;
+height: 100%;
+overflow-y: auto;
+background: var(–code-bg);
+padding: 20px;
+font-family: var(–font-mono);
+font-size: 14px;
+line-height: 1.7;
+white-space: pre;
+scrollbar-width: thin;
+scrollbar-color: var(–border) transparent;
+counter-reset: line;
+}
+
+.line {
+display: flex;
+min-height: 1.7em;
+}
+
+.line-num {
+color: #2d3f55;
+min-width: 38px;
+user-select: none;
+text-align: right;
+padding-right: 14px;
+font-size: 12px;
+flex-shrink: 0;
+}
+
+.line-content { flex: 1; }
+
+/* tokens */
+.kw     { color: #ff79c6; font-weight: 600; }
+.fn     { color: #82cfff; }
+.str    { color: #f1fa8c; }
+.num    { color: #bd93f9; }
+.cmt    { color: #4a6274; font-style: italic; }
+.op     { color: #ff79c6; }
+.builtin{ color: #50fa7b; }
+.var    { color: #cdd6f4; }
+.param  { color: #ffb86c; }
+.bool-v { color: #bd93f9; font-weight: 600; }
+.output-val { color: #a6e3a1; }
+
+/* ── OUTPUT PANE ────────────────────────────────────── */
+.output-pane {
+display: flex;
+flex-direction: column;
+overflow: hidden;
+}
+
+.output-scroll {
+flex: 1;
+overflow-y: auto;
+background: #060a12;
+padding: 20px;
+font-family: var(–font-mono);
+font-size: 13.5px;
+line-height: 1.8;
+scrollbar-width: thin;
+scrollbar-color: var(–border) transparent;
+}
+
+.output-line { display: block; }
+.output-line.comment { color: var(–gray); font-style: italic; }
+.output-line.value   { color: var(–green); }
+.output-line.error   { color: var(–red); }
+.output-line.heading { color: var(–teal-lt); font-weight: 700; border-bottom: 1px solid var(–border); padding-bottom: 4px; margin-bottom: 8px; }
+.output-line.blank   { height: 0.9em; display: block; }
+
+.prompt { color: var(–teal); margin-right: 8px; }
+
+/* ── BOTTOM BAR ─────────────────────────────────────── */
+.bottom-bar {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 10px 20px;
+background: var(–surface);
+border-top: 1px solid var(–border);
+flex-shrink: 0;
+gap: 12px;
+}
+
+.nav-btns { display: flex; gap: 10px; }
+
+.btn {
+display: flex; align-items: center; gap: 7px;
+padding: 8px 18px;
+border-radius: 6px;
+border: none;
+cursor: pointer;
+font-family: var(–font-ui);
+font-size: 13px;
+font-weight: 600;
+transition: all 0.15s;
+}
+
+.btn-primary {
+background: var(–teal);
+color: #fff;
+}
+.btn-primary:hover { background: var(–teal-lt); transform: translateY(-1px); }
+
+.btn-secondary {
+background: var(–surface2);
+color: var(–gray-lt);
+border: 1px solid var(–border);
+}
+.btn-secondary:hover { color: var(–white); border-color: var(–teal); }
+
+.btn-ghost {
+background: transparent;
+color: var(–gray);
+border: 1px solid var(–border);
+}
+.btn-ghost:hover { color: var(–white); }
+
+.btn-run {
+background: linear-gradient(135deg, #065f46, var(–teal));
+color: #fff;
+padding: 9px 22px;
+font-size: 14px;
+letter-spacing: 0.5px;
+box-shadow: 0 0 20px rgba(13,148,136,0.3);
+}
+.btn-run:hover {
+box-shadow: 0 0 30px rgba(13,148,136,0.5);
+transform: translateY(-1px);
+}
+
+/* ── MODULE BADGE ───────────────────────────────────── */
+.module-tag {
+font-size: 11px;
+font-family: var(–font-mono);
+padding: 3px 10px;
+border-radius: 99px;
+border: 1px solid;
+color: var(–white);
+}
+
+/* ── DESCRIPTION STRIP ──────────────────────────────── */
+.desc-strip {
+padding: 12px 20px;
+background: var(–surface2);
+border-bottom: 1px solid var(–border);
+display: flex;
+align-items: center;
+gap: 14px;
+flex-shrink: 0;
+}
+
+.demo-title {
+font-size: 15px;
+font-weight: 700;
+color: var(–white);
+flex: 1;
+}
+
+.demo-desc {
+font-size: 12px;
+color: var(–gray-lt);
+font-family: var(–font-mono);
+margin-top: 2px;
+}
+
+/* ── TALKING POINTS ─────────────────────────────────── */
+.talking-panel {
+background: var(–surface);
+border-top: 1px solid var(–border);
+padding: 12px 20px;
+flex-shrink: 0;
+}
+
+.talking-label {
+font-size: 9px;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–teal);
+font-family: var(–font-mono);
+margin-bottom: 6px;
+}
+
+.talking-points {
+display: flex;
+gap: 16px;
+flex-wrap: wrap;
+}
+
+.talking-point {
+font-size: 12px;
+color: var(–gray-lt);
+display: flex; align-items: flex-start; gap: 6px;
+max-width: 260px;
+}
+
+.tp-bullet {
+color: var(–teal);
+flex-shrink: 0;
+margin-top: 1px;
+}
+
+/* ── RUN ANIMATION ──────────────────────────────────── */
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(4px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+
+.output-line { animation: fadeIn 0.2s ease both; }
+
+.cursor-blink::after {
+content: ‘▊’;
+color: var(–teal-lt);
+animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+50% { opacity: 0; }
+}
+
+/* ── INTRO SCREEN ───────────────────────────────────── */
+.intro-overlay {
+position: fixed;
+inset: 0;
+background: var(–bg);
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+z-index: 999;
+gap: 24px;
+transition: opacity 0.5s;
+}
+
+.intro-overlay.hidden { opacity: 0; pointer-events: none; }
+
+.intro-logo {
+font-size: 64px;
+animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+0%, 100% { transform: translateY(0); }
+50% { transform: translateY(-10px); }
+}
+
+.intro-title {
+font-size: 42px;
+font-weight: 800;
+background: linear-gradient(135deg, var(–white), var(–teal-lt));
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+text-align: center;
+}
+
+.intro-sub {
+color: var(–gray);
+font-family: var(–font-mono);
+font-size: 14px;
+text-align: center;
+max-width: 440px;
+line-height: 1.7;
+}
+
+/* ── SCROLLBAR ──────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(–border); border-radius: 99px; }
+</style>
+
+</head>
+<body>
+
+<!-- INTRO SCREEN -->
+
+<div class="intro-overlay" id="intro">
+  <div class="intro-logo">🐍</div>
+  <div class="intro-title">Python Fundamentals<br>Live Demo Script</div>
+  <div class="intro-sub">
+    A step-by-step presenter tool. Walk through each module's code examples — the output appears instantly so your audience can see exactly what Python does.
+  </div>
+  <button class="btn btn-run" onclick="startDemo()">▶ &nbsp;Start Presenting</button>
+</div>
+
+<!-- HEADER -->
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🐍</div>
+    <div>
+      <div class="logo-text">Python Fundamentals</div>
+      <div class="logo-sub">Live Demo Script</div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <span id="progress-label">1 / 20</span>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:5%"></div>
+    </div>
+  </div>
+</header>
+
+<!-- SHELL -->
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+
+  <aside id="sidebar"></aside>
+
+  <!-- MAIN -->
+
+  <main>
+    <div class="desc-strip">
+      <div>
+        <div class="demo-title" id="demo-title">Loading…</div>
+        <div class="demo-desc"  id="demo-desc"></div>
+      </div>
+      <span class="module-tag" id="module-tag"></span>
+    </div>
+
+```
+<div class="demo-area">
+  <!-- Editor -->
+  <div class="editor-pane">
+    <div class="pane-header">
+      <div class="pane-title">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+        <span style="margin-left:8px" id="filename-label">demo.py</span>
+      </div>
+    </div>
+    <div class="code-display">
+      <div class="highlighted-code" id="code-display"></div>
+    </div>
+  </div>
+
+  <!-- Output -->
+  <div class="output-pane">
+    <div class="pane-header">
+      <div class="pane-title">
+        <span style="color:var(--green)">▶</span>
+        <span>Output</span>
+      </div>
+      <button class="btn btn-ghost" style="padding:3px 10px;font-size:11px" onclick="clearOutput()">Clear</button>
+    </div>
+    <div class="output-scroll" id="output-area">
+      <span class="output-line comment"># Output will appear here when you run the code</span>
+    </div>
+  </div>
+</div>
+
+<!-- Talking points -->
+<div class="talking-panel">
+  <div class="talking-label">💬 Talking Points</div>
+  <div class="talking-points" id="talking-points"></div>
+</div>
+
+<!-- Bottom bar -->
+<div class="bottom-bar">
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="navigate(-1)">← Prev</button>
+    <button class="btn btn-secondary" onclick="navigate(1)">Next →</button>
+  </div>
+  <button class="btn btn-run" onclick="runCode()">▶ &nbsp;Run Code</button>
+</div>
+```
+
+  </main>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// DEMO DATA
+// ═══════════════════════════════════════════════════════════════════
+const MODULES = [
+  // ── INTRO ──────────────────────────────────────────────────────
+  {
+    module: "Intro", moduleColor: "#0d9488",
+    title: "Hello, World!",
+    desc: "The classic first program — print() sends text to the screen",
+    file: "hello.py",
+    code: `# Your very first Python program!
+# Anything after a # is a comment — Python ignores it
+
+print("Hello, World!")
+
+print("Python is fun!")
+
+# You can print numbers too
+print(42)
+
+# f-strings let you embed variables in text
+name = "everyone"
+print(f"Hello, {name}!")`,
+    output: [
+      { type:"comment", text:"# Running hello.py…" },
+      { type:"blank" },
+      { type:"value",   text:"Hello, World!" },
+      { type:"value",   text:"Python is fun!" },
+      { type:"value",   text:"42" },
+      { type:"value",   text:"Hello, everyone!" },
+    ],
+    points: [
+      "print() is a built-in function — it outputs text to the console",
+      "Quotes (\\'...' or \"...\") wrap text (strings) in Python",
+      "f-strings (f\"...\") let you inject variable values directly into text",
+      "Comments start with # — they document your code for humans",
+    ]
+  },
+
+  // ── MODULE 1 ────────────────────────────────────────────────────
+  {
+    module: "Module 1", moduleColor: "#3b82f6",
+    title: "Variables — Storing Values",
+    desc: "Creating variables and assigning different types of data",
+    file: "variables.py",
+    code: `# Variables are labelled containers for values
+# Use  =  to assign a value
+
+name   = "Alice"      # str  (text)
+age    = 30           # int  (whole number)
+height = 1.68         # float (decimal)
+active = True         # bool  (True / False)
+
+print(name)
+print(age)
+print(height)
+print(active)
+
+# Reassign — the box just gets a new value
+age = 31
+print("Next year:", age)
+
+# Check the type of a variable
+print(type(name))
+print(type(age))`,
+    output: [
+      { type:"comment", text:"# Running variables.py…" },
+      { type:"blank" },
+      { type:"value",   text:"Alice" },
+      { type:"value",   text:"30" },
+      { type:"value",   text:"1.68" },
+      { type:"value",   text:"True" },
+      { type:"value",   text:"Next year: 31" },
+      { type:"value",   text:"<class 'str'>" },
+      { type:"value",   text:"<class 'int'>" },
+    ],
+    points: [
+      "Variable names should describe what they hold — be specific",
+      "Python figures out the type automatically — no need to declare it",
+      "Variables can be reassigned at any time; the old value is gone",
+      "type() is great for debugging — always know what you're working with",
+    ]
+  },
+  {
+    module: "Module 1", moduleColor: "#3b82f6",
+    title: "Arithmetic & String Operations",
+    desc: "Using Python as a calculator and combining text",
+    file: "operations.py",
+    code: `# ── Numbers ──────────────────────────
+a = 10
+b = 3
+
+print(a + b)    # addition:       13
+print(a - b)    # subtraction:     7
+print(a * b)    # multiplication: 30
+print(a / b)    # division:        3.333...
+print(a // b)   # floor division:  3
+print(a % b)    # remainder:       1
+print(a ** b)   # power:        1000
+
+# ── Strings ──────────────────────────
+first = "Hello"
+last  = "World"
+
+print(first + " " + last)   # join
+print(first * 3)             # repeat
+print(len(first))            # length
+
+# ── Mixed ────────────────────────────
+price = 12.50
+qty   = 4
+print(f"Total: £{price * qty}")`,
+    output: [
+      { type:"comment", text:"# Running operations.py…" },
+      { type:"blank" },
+      { type:"value", text:"13" },
+      { type:"value", text:"7" },
+      { type:"value", text:"30" },
+      { type:"value", text:"3.3333333333333335" },
+      { type:"value", text:"3" },
+      { type:"value", text:"1" },
+      { type:"value", text:"1000" },
+      { type:"blank" },
+      { type:"value", text:"Hello World" },
+      { type:"value", text:"HelloHelloHello" },
+      { type:"value", text:"5" },
+      { type:"blank" },
+      { type:"value", text:"Total: £50.0" },
+    ],
+    points: [
+      "// is integer (floor) division — drops the decimal remainder",
+      "% (modulo) gives the remainder — great for even/odd checks",
+      "** is the power operator — a**b means a to the power of b",
+      "+ on strings joins them (concatenation); * repeats them",
+    ]
+  },
+  {
+    module: "Module 1", moduleColor: "#3b82f6",
+    title: "Type Conversion",
+    desc: "Converting between data types safely",
+    file: "conversion.py",
+    code: `# Python won't auto-convert types — you do it explicitly
+
+age_text = "25"          # this is a STRING, not a number
+age_num  = int(age_text) # convert to integer
+
+print(age_num + 5)       # now we can do maths: 30
+
+# int ↔ float ↔ str
+price = 9.99
+print(int(price))        # drops decimal → 9
+print(str(price))        # becomes "9.99"
+print(float("3.14"))     # string → float
+
+# A common mistake
+score = "85"
+# print(score + 10)   # TypeError! Can't add str + int
+print(int(score) + 10)  # correct: 95
+
+# input() always returns a string!
+# num = input("Enter a number: ")
+# result = int(num) + 10   # must convert first`,
+    output: [
+      { type:"comment", text:"# Running conversion.py…" },
+      { type:"blank" },
+      { type:"value", text:"30" },
+      { type:"value", text:"9" },
+      { type:"value", text:"9.99" },
+      { type:"value", text:"3.14" },
+      { type:"value", text:"95" },
+    ],
+    points: [
+      "Python is strongly typed — it will never silently convert for you",
+      "int() truncates floats — it does NOT round, it just drops the decimal",
+      "str() is your best friend when building output strings",
+      "This is crucial: input() ALWAYS returns a string — always convert!",
+    ]
+  },
+
+  // ── MODULE 2 ────────────────────────────────────────────────────
+  {
+    module: "Module 2", moduleColor: "#8b5cf6",
+    title: "if / elif / else",
+    desc: "Making decisions based on conditions",
+    file: "conditions.py",
+    code: `# Python makes decisions with if / elif / else
+# The indented block only runs if the condition is True
+
+temperature = 38
+
+if temperature > 37.5:
+    print("🤒 You have a fever — rest up!")
+elif temperature >= 36.1:
+    print("👍 Normal temperature")
+else:
+    print("❄️  Temperature is low")
+
+print("Check complete.")
+
+# ── Comparison operators ──
+# ==  equal to
+# !=  not equal to
+# >   greater than
+# <   less than
+# >=  greater than or equal
+# <=  less than or equal
+
+score = 72
+grade = "A" if score >= 90 else "B" if score >= 80 else "C"
+print(f"Score {score} → Grade {grade}")`,
+    output: [
+      { type:"comment", text:"# Running conditions.py…" },
+      { type:"blank" },
+      { type:"value", text:"🤒 You have a fever — rest up!" },
+      { type:"value", text:"Check complete." },
+      { type:"value", text:"Score 72 → Grade C" },
+    ],
+    points: [
+      "Python uses indentation (4 spaces) instead of braces — it IS the structure",
+      "elif is short for 'else if' — conditions are tested top to bottom, first match wins",
+      "Only ONE branch runs — once a match is found, the rest are skipped",
+      "The one-liner (ternary) on line 25 is handy for simple assignments",
+    ]
+  },
+  {
+    module: "Module 2", moduleColor: "#8b5cf6",
+    title: "Combining Conditions: and / or / not",
+    desc: "Boolean logic for complex decision making",
+    file: "boolean_logic.py",
+    code: `age        = 20
+has_ticket = True
+is_vip     = False
+
+# AND — both must be True
+if age >= 18 and has_ticket:
+    print("✅ Welcome to the show!")
+
+# OR — at least one must be True
+if age < 12 or age >= 65:
+    print("🎟️  You get a discount!")
+else:
+    print("Full price ticket")
+
+# NOT — flips True ↔ False
+if not is_vip:
+    print("Standard queue for you")
+
+# Combining all three
+if age >= 18 and (has_ticket or is_vip):
+    print("🎉 Access granted")
+
+# Truthy / Falsy — Python treats some values as False
+name = ""
+if not name:
+    print("⚠️  Name cannot be empty")`,
+    output: [
+      { type:"comment", text:"# Running boolean_logic.py…" },
+      { type:"blank" },
+      { type:"value", text:"✅ Welcome to the show!" },
+      { type:"value", text:"Full price ticket" },
+      { type:"value", text:"Standard queue for you" },
+      { type:"value", text:"🎉 Access granted" },
+      { type:"value", text:"⚠️  Name cannot be empty" },
+    ],
+    points: [
+      "and: BOTH sides must be True. or: AT LEAST ONE side must be True",
+      "not flips the truth value — not True → False, not False → True",
+      "Use parentheses when mixing and/or to make precedence explicit",
+      "Falsy values: 0, '', [], {}, None, False — everything else is truthy",
+    ]
+  },
+  {
+    module: "Module 2", moduleColor: "#8b5cf6",
+    title: "for Loops",
+    desc: "Iterating over lists, strings, and ranges",
+    file: "for_loops.py",
+    code: `# Loop over a list
+fruits = ["apple", "banana", "cherry", "date"]
+
+for fruit in fruits:
+    print(f"🍎 {fruit}")
+
+print("---")
+
+# Loop a specific number of times with range()
+for i in range(1, 6):
+    print(f"Count: {i}")
+
+print("---")
+
+# Loop with index using enumerate()
+for i, fruit in enumerate(fruits):
+    print(f"{i}: {fruit}")
+
+print("---")
+
+# Loop over characters in a string
+for char in "Python":
+    print(char, end=" ")   # end=" " keeps it on one line
+
+print()  # newline
+
+# Sum with a loop
+total = 0
+for num in [10, 20, 30, 40]:
+    total += num
+print(f"Total: {total}")`,
+    output: [
+      { type:"comment", text:"# Running for_loops.py…" },
+      { type:"blank" },
+      { type:"value", text:"🍎 apple" },
+      { type:"value", text:"🍎 banana" },
+      { type:"value", text:"🍎 cherry" },
+      { type:"value", text:"🍎 date" },
+      { type:"value", text:"---" },
+      { type:"value", text:"Count: 1" },
+      { type:"value", text:"Count: 2" },
+      { type:"value", text:"Count: 3" },
+      { type:"value", text:"Count: 4" },
+      { type:"value", text:"Count: 5" },
+      { type:"value", text:"---" },
+      { type:"value", text:"0: apple" },
+      { type:"value", text:"1: banana" },
+      { type:"value", text:"2: cherry" },
+      { type:"value", text:"3: date" },
+      { type:"value", text:"---" },
+      { type:"value", text:"P y t h o n" },
+      { type:"value", text:"Total: 100" },
+    ],
+    points: [
+      "for x in collection — x takes each value one by one",
+      "range(start, stop) goes UP TO but NOT INCLUDING stop",
+      "enumerate() gives you both the index AND the value — very common pattern",
+      "end='' in print() changes what's appended after each call (default is newline)",
+    ]
+  },
+  {
+    module: "Module 2", moduleColor: "#8b5cf6",
+    title: "while Loops, break & continue",
+    desc: "Repeating until a condition changes",
+    file: "while_loops.py",
+    code: `# while — keeps looping as long as condition is True
+count = 1
+while count <= 5:
+    print(f"Count: {count}")
+    count += 1   # CRITICAL: must update or infinite loop!
+
+print("Done!")
+print("---")
+
+# break — exit the loop early
+for num in range(1, 11):
+    if num == 6:
+        print(f"Found 6! Breaking out.")
+        break
+    print(num)
+
+print("---")
+
+# continue — skip this iteration, go to the next
+print("Even numbers only:")
+for num in range(1, 11):
+    if num % 2 != 0:
+        continue     # skip odd numbers
+    print(num)
+
+print("---")
+
+# FizzBuzz — a classic!
+for n in range(1, 16):
+    if n % 15 == 0:
+        print("FizzBuzz")
+    elif n % 3 == 0:
+        print("Fizz")
+    elif n % 5 == 0:
+        print("Buzz")
+    else:
+        print(n)`,
+    output: [
+      { type:"comment", text:"# Running while_loops.py…" },
+      { type:"blank" },
+      { type:"value", text:"Count: 1" },
+      { type:"value", text:"Count: 2" },
+      { type:"value", text:"Count: 3" },
+      { type:"value", text:"Count: 4" },
+      { type:"value", text:"Count: 5" },
+      { type:"value", text:"Done!" },
+      { type:"value", text:"---" },
+      { type:"value", text:"1  2  3  4  5  Found 6! Breaking out." },
+      { type:"value", text:"---" },
+      { type:"value", text:"Even numbers only:" },
+      { type:"value", text:"2  4  6  8  10" },
+      { type:"value", text:"---" },
+      { type:"value", text:"1  2  Fizz  4  Buzz  Fizz  7  8  Fizz  Buzz  11  Fizz  13  14  FizzBuzz" },
+    ],
+    points: [
+      "while loops need something to change inside — or they run forever",
+      "break immediately exits the entire loop — not just the current iteration",
+      "continue skips the rest of the current iteration and jumps to the next",
+      "FizzBuzz: check % 15 FIRST — order matters with elif chains",
+    ]
+  },
+
+  // ── MODULE 3 ────────────────────────────────────────────────────
+  {
+    module: "Module 3", moduleColor: "#f97316",
+    title: "Defining & Calling Functions",
+    desc: "Packaging code into named, reusable blocks",
+    file: "functions_basic.py",
+    code: `# def defines a function — the body is indented
+def say_hello():
+    print("Hello from a function!")
+
+# Call it — as many times as you like
+say_hello()
+say_hello()
+say_hello()
+
+print("---")
+
+# Functions with parameters (inputs)
+def greet(name):
+    print(f"Hello, {name}! Welcome to Python.")
+
+greet("Alice")
+greet("Bob")
+greet("everyone")
+
+print("---")
+
+# Default parameter values
+def greet_formal(name, title="Ms"):
+    print(f"Good morning, {title} {name}.")
+
+greet_formal("Smith")           # uses default
+greet_formal("Jones", "Dr")     # overrides default`,
+    output: [
+      { type:"comment", text:"# Running functions_basic.py…" },
+      { type:"blank" },
+      { type:"value", text:"Hello from a function!" },
+      { type:"value", text:"Hello from a function!" },
+      { type:"value", text:"Hello from a function!" },
+      { type:"value", text:"---" },
+      { type:"value", text:"Hello, Alice! Welcome to Python." },
+      { type:"value", text:"Hello, Bob! Welcome to Python." },
+      { type:"value", text:"Hello, everyone! Welcome to Python." },
+      { type:"value", text:"---" },
+      { type:"value", text:"Good morning, Ms Smith." },
+      { type:"value", text:"Good morning, Dr Jones." },
+    ],
+    points: [
+      "Define once, call anywhere — that's the whole point of functions",
+      "Parameters are the variable names in the def line; arguments are the actual values passed in",
+      "Default values make parameters optional — put them at the END of the parameter list",
+      "If you change the function body, every place that calls it gets the update for free",
+    ]
+  },
+  {
+    module: "Module 3", moduleColor: "#f97316",
+    title: "Return Values",
+    desc: "Functions that compute and send back a result",
+    file: "return_values.py",
+    code: `# return sends a value back to the caller
+
+def add(a, b):
+    return a + b
+
+result = add(5, 3)
+print(result)          # 8
+print(add(10, 20))     # 30
+
+# Returning from a condition
+def absolute_value(n):
+    if n >= 0:
+        return n
+    else:
+        return -n
+
+print(absolute_value(-7))   # 7
+print(absolute_value(4))    # 4
+
+# Practical example: temperature converter
+def celsius_to_fahrenheit(c):
+    return c * 9/5 + 32
+
+temps = [0, 20, 37, 100]
+for t in temps:
+    f = celsius_to_fahrenheit(t)
+    print(f"{t}°C  →  {f}°F")`,
+    output: [
+      { type:"comment", text:"# Running return_values.py…" },
+      { type:"blank" },
+      { type:"value", text:"8" },
+      { type:"value", text:"30" },
+      { type:"value", text:"7" },
+      { type:"value", text:"4" },
+      { type:"value", text:"0°C  →  32.0°F" },
+      { type:"value", text:"20°C  →  68.0°F" },
+      { type:"value", text:"37°C  →  98.6°F" },
+      { type:"value", text:"100°C  →  212.0°F" },
+    ],
+    points: [
+      "return exits the function immediately — code after it does NOT run",
+      "The returned value can be stored in a variable, printed, or passed to another function",
+      "A function without return implicitly returns None",
+      "You can call a function anywhere an expression is expected: print(add(1,2))",
+    ]
+  },
+  {
+    module: "Module 3", moduleColor: "#f97316",
+    title: "Scope — Local vs Global",
+    desc: "Understanding where variables can be seen",
+    file: "scope.py",
+    code: `# Global variable — lives outside any function
+message = "I am global"
+
+def show_message():
+    # Can READ the global variable
+    print(message)
+
+def change_locally():
+    # This creates a LOCAL variable — does NOT change the global
+    message = "I am local"
+    print("Inside:", message)
+
+show_message()       # I am global
+change_locally()     # Inside: I am local
+show_message()       # Still: I am global (unchanged!)
+
+print("---")
+
+# Best practice: pass values IN, return values OUT
+def double(n):
+    result = n * 2    # result is local
+    return result
+
+x = 7
+y = double(x)
+print(f"double({x}) = {y}")
+# result is not accessible here — it only existed inside double()`,
+    output: [
+      { type:"comment", text:"# Running scope.py…" },
+      { type:"blank" },
+      { type:"value", text:"I am global" },
+      { type:"value", text:"Inside: I am local" },
+      { type:"value", text:"I am global" },
+      { type:"value", text:"---" },
+      { type:"value", text:"double(7) = 14" },
+    ],
+    points: [
+      "Variables created INSIDE a function are local — they vanish when the function ends",
+      "Functions can READ globals but should not WRITE to them (use return instead)",
+      "Treating functions as black boxes — inputs in, output out — makes code predictable",
+      "If you get NameError, the variable is probably out of scope",
+    ]
+  },
+
+  // ── MODULE 4 ────────────────────────────────────────────────────
+  {
+    module: "Module 4", moduleColor: "#ec4899",
+    title: "Lists — Creating & Accessing",
+    desc: "Ordered, changeable collections of items",
+    file: "lists_basics.py",
+    code: `# Lists are ordered collections — create with [ ]
+fruits = ["apple", "banana", "cherry", "date"]
+
+# Indexing — starts at 0!
+print(fruits[0])      # first item
+print(fruits[1])      # second item
+print(fruits[-1])     # last item (negative index!)
+print(fruits[-2])     # second to last
+
+# Slicing — get a sub-list
+print(fruits[1:3])    # index 1 and 2 (not 3)
+print(fruits[:2])     # from start to index 2
+print(fruits[2:])     # from index 2 to end
+print(fruits[:])      # a copy of the whole list
+
+# Length
+print(f"There are {len(fruits)} fruits")
+
+# Check membership
+print("banana" in fruits)     # True
+print("mango" in fruits)      # False`,
+    output: [
+      { type:"comment", text:"# Running lists_basics.py…" },
+      { type:"blank" },
+      { type:"value", text:"apple" },
+      { type:"value", text:"banana" },
+      { type:"value", text:"date" },
+      { type:"value", text:"cherry" },
+      { type:"value", text:"['banana', 'cherry']" },
+      { type:"value", text:"['apple', 'banana']" },
+      { type:"value", text:"['cherry', 'date']" },
+      { type:"value", text:"['apple', 'banana', 'cherry', 'date']" },
+      { type:"value", text:"There are 4 fruits" },
+      { type:"value", text:"True" },
+      { type:"value", text:"False" },
+    ],
+    points: [
+      "Indexing starts at 0 — the first item is [0], the second is [1]",
+      "Negative indices count from the end: [-1] is always the last item",
+      "Slicing [start:stop] includes start but EXCLUDES stop",
+      "in is a fast, readable way to check if a value exists in a list",
+    ]
+  },
+  {
+    module: "Module 4", moduleColor: "#ec4899",
+    title: "Lists — Modifying",
+    desc: "Adding, removing, and transforming list contents",
+    file: "lists_modify.py",
+    code: `shopping = ["milk", "eggs", "bread"]
+
+# Add items
+shopping.append("butter")          # add to end
+shopping.insert(1, "coffee")       # insert at index 1
+print("After adding:", shopping)
+
+# Remove items
+shopping.remove("eggs")            # remove by value
+popped = shopping.pop()            # remove & return last
+print(f"Popped: {popped}")
+print("After removing:", shopping)
+
+# Change an item
+shopping[0] = "oat milk"
+print("After changing:", shopping)
+
+# Useful operations
+numbers = [3, 1, 4, 1, 5, 9, 2, 6]
+numbers.sort()
+print("Sorted:", numbers)
+
+numbers.reverse()
+print("Reversed:", numbers)
+
+print("Max:", max(numbers))
+print("Min:", min(numbers))
+print("Sum:", sum(numbers))`,
+    output: [
+      { type:"comment", text:"# Running lists_modify.py…" },
+      { type:"blank" },
+      { type:"value", text:"After adding: ['milk', 'coffee', 'eggs', 'bread', 'butter']" },
+      { type:"value", text:"Popped: butter" },
+      { type:"value", text:"After removing: ['milk', 'coffee', 'bread']" },
+      { type:"value", text:"After changing: ['oat milk', 'coffee', 'bread']" },
+      { type:"value", text:"Sorted: [1, 1, 2, 3, 4, 5, 6, 9]" },
+      { type:"value", text:"Reversed: [9, 6, 5, 4, 3, 2, 1, 1]" },
+      { type:"value", text:"Max: 9" },
+      { type:"value", text:"Min: 1" },
+      { type:"value", text:"Sum: 31" },
+    ],
+    points: [
+      "append() is O(1) — very fast. insert(0, x) is O(n) — shifts every element",
+      "pop() without an argument removes the last item; pop(i) removes at index i",
+      "sort() sorts in-place and returns None — don't do sorted_list = my_list.sort()",
+      "max(), min(), sum() work on any iterable of numbers — not just lists",
+    ]
+  },
+  {
+    module: "Module 4", moduleColor: "#ec4899",
+    title: "Dictionaries",
+    desc: "Key-value pairs for fast lookups by name",
+    file: "dicts.py",
+    code: `# Dictionaries store key: value pairs
+person = {
+    "name":  "Alice",
+    "age":   30,
+    "city":  "London",
+    "score": 95.5
+}
+
+# Access by key
+print(person["name"])
+print(person["age"])
+
+# Safe access with .get() (no KeyError if missing)
+print(person.get("email", "No email on file"))
+
+# Add / update / delete
+person["email"] = "alice@example.com"   # add new key
+person["age"]   = 31                    # update existing
+del person["score"]                     # delete a key
+
+print(person)
+
+# Iterate
+print("--- Contact Card ---")
+for key, value in person.items():
+    print(f"  {key:10}: {value}")
+
+# Check if key exists
+print("email" in person)     # True
+print("phone" in person)     # False`,
+    output: [
+      { type:"comment", text:"# Running dicts.py…" },
+      { type:"blank" },
+      { type:"value", text:"Alice" },
+      { type:"value", text:"30" },
+      { type:"value", text:"No email on file" },
+      { type:"value", text:"{'name': 'Alice', 'age': 31, 'city': 'London', 'email': 'alice@example.com'}" },
+      { type:"value", text:"--- Contact Card ---" },
+      { type:"value", text:"  name      : Alice" },
+      { type:"value", text:"  age       : 31" },
+      { type:"value", text:"  city      : London" },
+      { type:"value", text:"  email     : alice@example.com" },
+      { type:"value", text:"True" },
+      { type:"value", text:"False" },
+    ],
+    points: [
+      "dict[key] raises KeyError if missing; .get(key, default) is safer",
+      "Keys must be unique — assigning to an existing key overwrites the value",
+      ".items() returns key-value pairs; .keys() and .values() return just those",
+      "Dicts are ordered by insertion order in Python 3.7+ (a common interview question!)",
+    ]
+  },
+  {
+    module: "Module 4", moduleColor: "#ec4899",
+    title: "Tuples",
+    desc: "Immutable sequences — fixed data that cannot change",
+    file: "tuples.py",
+    code: `# Tuples use () — they cannot be changed after creation
+coordinates = (51.5074, -0.1278)  # London lat, lng
+rgb_red      = (255, 0, 0)
+today        = (2025, 6, 15)      # year, month, day
+
+# Access like a list
+print(coordinates[0])    # latitude
+print(rgb_red[1])        # green channel
+
+# Unpacking — assign each value to a variable
+lat, lng = coordinates
+print(f"Latitude: {lat}, Longitude: {lng}")
+
+year, month, day = today
+print(f"Year: {year}, Month: {month}, Day: {day}")
+
+# Tuples in practice — returning multiple values from a function
+def min_max(numbers):
+    return min(numbers), max(numbers)    # returns a tuple
+
+low, high = min_max([4, 1, 7, 2, 9, 3])
+print(f"Range: {low} – {high}")
+
+# This would raise a TypeError:
+# coordinates[0] = 52   # TypeError: 'tuple' object does not support item assignment`,
+    output: [
+      { type:"comment", text:"# Running tuples.py…" },
+      { type:"blank" },
+      { type:"value", text:"51.5074" },
+      { type:"value", text:"0" },
+      { type:"value", text:"Latitude: 51.5074, Longitude: -0.1278" },
+      { type:"value", text:"Year: 2025, Month: 6, Day: 15" },
+      { type:"value", text:"Range: 1 – 9" },
+    ],
+    points: [
+      "Tuples signal intent: this data should NOT change — great for coordinates, colours, dates",
+      "Unpacking is one of Python's most elegant features — assign multiple variables in one line",
+      "Functions that return multiple values actually return a tuple",
+      "Tuples are slightly faster and use less memory than lists — use them when data is fixed",
+    ]
+  },
+
+  // ── GRAND CHALLENGE ─────────────────────────────────────────────
+  {
+    module: "Challenge", moduleColor: "#fcd34d",
+    title: "Grand Challenge Solution — Student Grade Manager",
+    desc: "Combining all four modules into one complete program",
+    file: "grade_manager.py",
+    code: `# ── Student Grade Manager ─────────────────────────
+# Combines: dicts, lists, functions, loops, if/elif
+
+# Module 4: dict with list values
+students = {
+    "Alice":   [88, 92, 79],
+    "Bob":     [74, 68, 82],
+    "Charlie": [95, 97, 91],
+    "Diana":   [61, 55, 70],
+    "Eve":     [83, 88, 90],
+}
+
+# Module 3: function — calculate average
+def get_average(scores):
+    return sum(scores) / len(scores)
+
+# Module 3: function — determine grade
+def get_grade(average):
+    if average >= 90:   return "A"
+    elif average >= 80: return "B"
+    elif average >= 70: return "C"
+    elif average >= 60: return "D"
+    else:               return "Fail"
+
+# Module 2: loop + conditional formatting
+print("=" * 40)
+print(f"{'STUDENT':<10} {'AVG':>6} {'GRADE':>6}")
+print("=" * 40)
+
+all_averages = []
+
+for name, scores in students.items():       # Module 4
+    avg   = get_average(scores)             # Module 3
+    grade = get_grade(avg)                  # Module 3
+    all_averages.append(avg)               # Module 4
+    bar   = "█" * int(avg // 10)
+    print(f"{name:<10} {avg:>6.1f} {grade:>6}  {bar}")
+
+# BONUS: class stats
+print("=" * 40)
+class_avg = get_average(all_averages)
+top_idx   = all_averages.index(max(all_averages))
+top_name  = list(students.keys())[top_idx]
+print(f"Class average: {class_avg:.1f}")
+print(f"Top student:   {top_name}")`,
+    output: [
+      { type:"comment", text:"# Running grade_manager.py…" },
+      { type:"blank" },
+      { type:"heading", text:"========================================" },
+      { type:"heading", text:"STUDENT        AVG  GRADE" },
+      { type:"heading", text:"========================================" },
+      { type:"value", text:"Alice       86.3      B  ████████" },
+      { type:"value", text:"Bob         74.7      C  ███████" },
+      { type:"value", text:"Charlie     94.3      A  █████████" },
+      { type:"value", text:"Diana       62.0      D  ██████" },
+      { type:"value", text:"Eve         87.0      B  ████████" },
+      { type:"heading", text:"========================================" },
+      { type:"value", text:"Class average: 80.9" },
+      { type:"value", text:"Top student:   Charlie" },
+    ],
+    points: [
+      "This program uses EVERY concept from today — show how they all connect",
+      "get_average and get_grade are reusable — changing grading rules means editing one place",
+      "f-string formatting codes: {avg:>6.1f} = right-align, 6 chars wide, 1 decimal place",
+      "The bar chart is created with string multiplication: '█' * int(avg // 10)",
+    ]
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════════
+// SYNTAX HIGHLIGHTING
+// ═══════════════════════════════════════════════════════════════════
+const KEYWORDS  = new Set(["def","return","if","elif","else","for","while","in","and","or","not","break","continue","import","from","class","True","False","None","pass","lambda","yield","with","as","try","except","finally","raise","del","global","nonlocal"]);
+const BUILTINS  = new Set(["print","range","len","type","int","float","str","bool","list","dict","tuple","set","input","enumerate","zip","map","filter","sorted","min","max","sum","abs","round","format","open","isinstance","hasattr","getattr","setattr"]);
+
+function escHtml(s) {
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function highlightLine(raw) {
+  let out = "";
+  let i   = 0;
+  const src = raw;
+  const n   = src.length;
+
+  while (i < n) {
+    // comment
+    if (src[i] === '#') {
+      out += `<span class="cmt">${escHtml(src.slice(i))}</span>`;
+      break;
+    }
+    // string
+    if (src[i] === '"' || src[i] === "'") {
+      const q   = src[i];
+      const tri = src.startsWith(q+q+q, i);
+      const end = tri ? q+q+q : q;
+      let j     = i + (tri ? 3 : 1);
+      while (j < n) {
+        if (src[j] === '\\') { j += 2; continue; }
+        if (src.startsWith(end, j)) { j += end.length; break; }
+        j++;
+      }
+      out += `<span class="str">${escHtml(src.slice(i,j))}</span>`;
+      i = j; continue;
+    }
+    // number
+    if (/[0-9]/.test(src[i]) && (i===0 || /[\s\W]/.test(src[i-1]))) {
+      let j = i;
+      while (j < n && /[\d._]/.test(src[j])) j++;
+      out += `<span class="num">${escHtml(src.slice(i,j))}</span>`;
+      i = j; continue;
+    }
+    // identifier / keyword
+    if (/[a-zA-Z_]/.test(src[i])) {
+      let j = i;
+      while (j < n && /[a-zA-Z0-9_]/.test(src[j])) j++;
+      const word = src.slice(i, j);
+      const peek = src.slice(j).trimStart();
+      if (KEYWORDS.has(word)) {
+        out += `<span class="kw">${escHtml(word)}</span>`;
+      } else if (BUILTINS.has(word)) {
+        out += `<span class="builtin">${escHtml(word)}</span>`;
+      } else if (peek.startsWith('(')) {
+        out += `<span class="fn">${escHtml(word)}</span>`;
+      } else {
+        out += `<span class="var">${escHtml(word)}</span>`;
+      }
+      i = j; continue;
+    }
+    // operator chars
+    if (/[+\-*/%=<>!&|^~]/.test(src[i])) {
+      let j = i;
+      while (j < n && /[+\-*/%=<>!&|^~]/.test(src[j])) j++;
+      out += `<span class="op">${escHtml(src.slice(i,j))}</span>`;
+      i = j; continue;
+    }
+    out += escHtml(src[i]);
+    i++;
+  }
+  return out;
+}
+
+function renderCode(code) {
+  const lines = code.split('\n');
+  return lines.map((line, idx) =>
+    `<div class="line"><span class="line-num">${idx+1}</span><span class="line-content">${highlightLine(line)}</span></div>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// STATE & NAVIGATION
+// ═══════════════════════════════════════════════════════════════════
+let current = 0;
+
+function buildSidebar() {
+  const aside  = document.getElementById('sidebar');
+  let lastMod  = '';
+  let html     = '';
+
+  MODULES.forEach((m, i) => {
+    if (m.module !== lastMod) {
+      lastMod = m.module;
+      html += `<div class="sidebar-section"><div class="sidebar-heading">${m.module}</div>`;
+    }
+    html += `<div class="nav-item" id="nav-${i}" onclick="goto(${i})">
+      <div class="nav-dot" style="background:${m.moduleColor}"></div>
+      <span>${m.title}</span>
+      <span class="nav-num">${String(i+1).padStart(2,'0')}</span>
+    </div>`;
+  });
+  html += '</div>';
+  aside.innerHTML = html;
+}
+
+function goto(idx) {
+  current = Math.max(0, Math.min(MODULES.length-1, idx));
+  render();
+}
+
+function navigate(dir) { goto(current + dir); }
+
+function render() {
+  const m = MODULES[current];
+
+  // Sidebar active
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', i === current);
+  });
+  document.getElementById(`nav-${current}`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+  // Header progress
+  const pct = ((current + 1) / MODULES.length * 100).toFixed(0);
+  document.getElementById('progress-fill').style.width  = pct + '%';
+  document.getElementById('progress-label').textContent = `${current+1} / ${MODULES.length}`;
+
+  // Desc strip
+  document.getElementById('demo-title').textContent = m.title;
+  document.getElementById('demo-desc').textContent  = m.desc;
+  const tag = document.getElementById('module-tag');
+  tag.textContent    = m.module;
+  tag.style.color    = m.moduleColor;
+  tag.style.borderColor = m.moduleColor;
+  tag.style.backgroundColor = m.moduleColor + '18';
+
+  // Filename
+  document.getElementById('filename-label').textContent = m.file;
+
+  // Code
+  document.getElementById('code-display').innerHTML = renderCode(m.code);
+
+  // Clear output
+  document.getElementById('output-area').innerHTML =
+    `<span class="output-line comment"># Press ▶ Run Code to see the output</span>`;
+
+  // Talking points
+  const tp = document.getElementById('talking-points');
+  tp.innerHTML = (m.points || []).map(p =>
+    `<div class="talking-point"><span class="tp-bullet">›</span><span>${p}</span></div>`
+  ).join('');
+}
+
+function clearOutput() {
+  document.getElementById('output-area').innerHTML =
+    `<span class="output-line comment"># Output cleared</span>`;
+}
+
+async function runCode() {
+  const m   = MODULES[current];
+  const out = document.getElementById('output-area');
+  out.innerHTML = '';
+
+  const btn = document.querySelector('.btn-run');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ &nbsp;Running…';
+
+  for (let i = 0; i < m.output.length; i++) {
+    await new Promise(r => setTimeout(r, 60 + Math.random() * 40));
+    const line = m.output[i];
+    const el   = document.createElement('span');
+    el.className = `output-line ${line.type}`;
+    el.style.animationDelay = `${i * 0.04}s`;
+
+    if (line.type === 'blank') {
+      el.innerHTML = '&nbsp;';
+    } else if (line.type === 'comment') {
+      el.innerHTML = `<span style="color:var(--gray)">${escHtml(line.text)}</span>`;
+    } else if (line.type === 'error') {
+      el.innerHTML = `<span style="color:var(--red)">❌ ${escHtml(line.text)}</span>`;
+    } else if (line.type === 'heading') {
+      el.innerHTML = `<span style="color:var(--teal-lt);font-weight:700">${escHtml(line.text)}</span>`;
+    } else {
+      el.innerHTML = `<span class="prompt">»</span>${escHtml(line.text)}`;
+    }
+    out.appendChild(el);
+    out.scrollTop = out.scrollHeight;
+  }
+
+  // Final cursor blink
+  const cursor = document.createElement('span');
+  cursor.className = 'output-line cursor-blink';
+  cursor.style.color = 'var(--teal)';
+  cursor.textContent = '$ ';
+  out.appendChild(cursor);
+
+  btn.disabled = false;
+  btn.innerHTML = '▶ &nbsp;Run Code';
+}
+
+function startDemo() {
+  document.getElementById('intro').classList.add('hidden');
+  setTimeout(() => document.getElementById('intro').remove(), 500);
+}
+
+// keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navigate(-1);
+  if (e.key === 'Enter' || e.key === ' ') runCode();
+});
+
+// init
+buildSidebar();
+render();
+</script>
+
+</body>
+</html>
